@@ -1,7 +1,5 @@
-# Stripe Setup
-A Python project for setting up Stripe payments with a few clicks.
+# Deploy
+A simple deployment tool that provisions a PostgreSQL instance, a Docker container on AWS Fargate, and a DNS record under launchpad.axentx.com.
 
 ## Usage
-1. Install the project using `poetry install`.
-2. Run the tests using `pytest`.
-3. Use the `setup_stripe` function to generate a Stripe setup.
+Run the deployment script with the following command:

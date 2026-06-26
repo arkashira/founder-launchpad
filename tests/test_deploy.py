@@ -1,31 +1,34 @@
-import pytest
-from deploy import Deployer, Deployment
+import json
+from deploy import DeploymentConfig, get_deployment_status
 
-def test_deploy_success():
-    deployer = Deployer()
-    deployment = deployer.deploy("test_id")
-    assert deployment.status == "success"
-    assert deployment.url == "https://launchpad.axentx.com/test_id"
-    assert deployment.logs == ["Deployment successful"]
+def test_get_deployment_status():
+    deployment_config = DeploymentConfig(
+        docker_container="my-docker-container",
+        postgres_instance="my-postgres-instance",
+        stripe_payment_gateway={"stripe_key": "my-stripe-key", "stripe_secret": "my-stripe-secret"}
+    )
+    
+    deployment_status = get_deployment_status(deployment_config)
+    deployment_status_json = json.loads(deployment_status)
+    
+    assert deployment_status_json["docker_container_status"] == "provisioned"
+    assert deployment_status_json["postgres_instance_status"] == "provisioned"
+    assert deployment_status_json["stripe_payment_gateway_status"] == "injected"
+    assert deployment_status_json["deployment_status"] == "deploying"
+    assert deployment_status_json["live_url"] == "https://example.com"
 
-def test_deploy_failure():
-    deployer = Deployer()
-    # Simulate an exception
-    deployer.deploy = lambda id: Deployment(id, "failed", [f"Deployment failed: Test exception"])
-    deployment = deployer.deploy("test_id")
-    assert deployment.status == "failed"
-    assert deployment.url is None
-    assert deployment.logs == ["Deployment failed: Test exception"]
-
-def test_get_status():
-    deployer = Deployer()
-    deployer.deploy("test_id")
-    deployment = deployer.get_status("test_id")
-    assert deployment.status == "success"
-    assert deployment.url == "https://launchpad.axentx.com/test_id"
-    assert deployment.logs == ["Deployment successful"]
-
-def test_get_status_non_existent():
-    deployer = Deployer()
-    deployment = deployer.get_status("non_existent_id")
-    assert deployment is None
+def test_get_deployment_status_empty_config():
+    deployment_config = DeploymentConfig(
+        docker_container="",
+        postgres_instance="",
+        stripe_payment_gateway={}
+    )
+    
+    deployment_status = get_deployment_status(deployment_config)
+    deployment_status_json = json.loads(deployment_status)
+    
+    assert deployment_status_json["docker_container_status"] == "provisioned"
+    assert deployment_status_json["postgres_instance_status"] == "provisioned"
+    assert deployment_status_json["stripe_payment_gateway_status"] == "injected"
+    assert deployment_status_json["deployment_status"] == "deploying"
+    assert deployment_status_json["live_url"] == "https://example.com"

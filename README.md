@@ -1,5 +1,8 @@
 # Deploy
-A simple deployment tool that provisions a PostgreSQL instance, a Docker container on AWS Fargate, and a DNS record under launchpad.axentx.com.
+A Python project for deploying a generated scaffold to a managed environment with one click.
 
 ## Usage
-Run the deployment script with the following command:
+To use this project, simply run the `deploy.py` script with the required configuration.
+
+## Testing
+To run the tests, use the `pytest` command.
